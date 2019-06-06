@@ -31,7 +31,12 @@ app.post("/api/users", (req, res) => {
     connection.query("INSERT INTO user SET ?", user, (err, result) => {
         if (err) {
             console.log(err);
-            return res.status(500).json({message: "Failed to insert"});
+
+            if (err.code === 'ER_DUP_ENTRY') {
+                return res.status(400).json({message: err.sqlMessage});
+            } else {
+                return res.status(500).json({message: "Failed to insert. Please try again."});
+            }
         }
 
         console.log(result);
